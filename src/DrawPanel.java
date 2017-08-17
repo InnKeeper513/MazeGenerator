@@ -27,7 +27,7 @@ public class DrawPanel extends JPanel {
     DrawPanel() {
 
         // initialization;
-        grid = new int[ROW * PIXEL_SIZE][COL * PIXEL_SIZE];
+        grid = new int[ROW * 3][COL * 3];
         maze = new int[ROW][COL];
 
         // For the maze 0 is unexplored, 1 is explored, 2 is went back
@@ -37,25 +37,17 @@ public class DrawPanel extends JPanel {
             }
         }
         // Set the walls
-        for (int i = 0; i < ROW * PIXEL_SIZE; i++) {
-            for (int j = 0; j < COL * PIXEL_SIZE; j+=PIXEL_SIZE) {
-               grid[i][j] = 3;
-               grid[i][j+1] = 3;
-               grid[i][j+2] = 3;
-               grid[i][j+3] = 0;
-               grid[i][j+4] = 0;
-               grid[i][j+5] = 0;
-               grid[i][j+6] = 3;
-               grid[i][j+7] = 3;
-               grid[i][j+8] = 3;
+        for (int i = 0; i < ROW * 3; i++) {
+            for (int j = 0; j < COL * 3; j+=3) {
+               grid[i][j] = 0;
+               grid[i][j+1] = 0;
+               grid[i][j+2] = 0;
             }
         }
 
-        for (int i = 0; i < ROW * PIXEL_SIZE; i++) {
-            for (int j = 0; j < COL * PIXEL_SIZE; j+=PIXEL_SIZE) {
-                grid[j+3][i] = 0;
-                grid[j+4][i] = 0;
-                grid[j+5][i] = 0;
+        for (int i = 0; i < ROW * SINGLE_PIX; i++) {
+            for (int j = 0; j < COL * SINGLE_PIX; j+=SINGLE_PIX) {
+                //grid[j+1][i] = 0;
             }
         }
     }
@@ -66,24 +58,20 @@ public class DrawPanel extends JPanel {
         g2d.setColor(Color.GRAY);
         g2d.fillRect(0,0,getWidth(),getHeight());
 
-        for(int i = 0; i < ROW * PIXEL_SIZE; i++){
-            for(int j = 0; j < ROW * PIXEL_SIZE; j++){
+        for(int i = 0; i < ROW * 3; i++){
+            for(int j = 0; j < ROW * 3; j++){
                 if(grid[i][j] == 0){
                     // WALL
                     g2d.setColor(Color.BLACK);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX,BLANK + j * SINGLE_PIX, SINGLE_PIX,SINGLE_PIX);
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3,BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
                 } else if(grid[i][j] == 1){
                     // PATH
                     g2d.setColor(Color.WHITE);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX,BLANK + j * SINGLE_PIX, SINGLE_PIX,SINGLE_PIX);
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3,BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
                 } else if(grid[i][j] == 2){
                     // RETURN PATH
                     g2d.setColor(Color.BLUE);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX, BLANK + j * SINGLE_PIX, SINGLE_PIX,SINGLE_PIX);
-                } else if(grid[i][j] == 3){
-                    // WALL Cannot be modified
-                    g2d.setColor(Color.BLACK);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX, BLANK + j * SINGLE_PIX, SINGLE_PIX,SINGLE_PIX);
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
                 }
             }
         }

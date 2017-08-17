@@ -1,14 +1,16 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Control extends JPanel {
 
 
     Stack<Coordinate> rewind = new Stack<>();
     JButton move = new JButton("Move");
+    JButton timer = new JButton("Start");
 
     // Check if the maze has done its creation
     public boolean checkDone(DrawPanel dp){
@@ -33,14 +35,35 @@ public class Control extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if(e.getSource() == move)
                     random(dp);
+
+                if(e.getSource() == timer){
+                        random(dp);
+                        Timer timing = new Timer();
+                        timing.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+
+                                  if (!checkDone(dp)) {
+                                    random(dp);
+                                  } else {
+                                        timing.cancel();
+                                        timing.purge();
+                                  }
+
+                            }
+                        },0,50);
+
+                }
             }
         };
-
 
         move.addActionListener(al);
         move.setVisible(true);
         add(move);
 
+        timer.addActionListener(al);
+        timer.setVisible(true);
+        add(timer);
     }
 
     Vector<Coordinate> availablePositions(DrawPanel dp) {
@@ -148,21 +171,67 @@ public class Control extends JPanel {
             rewind.push(current);
 
             // Proceed forward.
+            dp.prevXPos = dp.xPos;
+            dp.prevYPos = dp.yPos;
             dp.xPos = selected.xPos;
             dp.yPos = selected.yPos;
 
+            int xDiff = dp.xPos - dp.prevXPos ;
+            int yDiff = dp.yPos - dp.prevYPos;
 
+            try
+            {
+                // Draw the center point of the previous position
+                dp.grid[dp.prevXPos * 3 + 1][dp.prevYPos * 3 + 1] = 1;
+                Thread.sleep(50);
+                // Draw the road to the next point
+                dp.grid[dp.prevXPos * 3 + 1 + xDiff][dp.prevYPos * 3 + 1 + yDiff] = 1;
+                Thread.sleep(50);
+                // Draw the raod to the next point
+                dp.grid[dp.xPos * 3 + 1 - xDiff][dp.yPos * 3 + 1 - yDiff] = 1;
+                // Draw the next point's center point.
+                dp.grid[dp.xPos * 3 + 1][dp.yPos * 3 + 1] = 1;
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
 
-            // repaint();
+            dp.repaint();
         } else {
             // Need to rewind back
 
             Coordinate back = rewind.pop();
             dp.maze[yPos][xPos] = 2;
+            dp.prevXPos = dp.xPos;
+            dp.prevYPos = dp.yPos;
             dp.xPos = back.xPos;
             dp.yPos = back.yPos;
+
+            int xDiff = dp.xPos - dp.prevXPos ;
+            int yDiff = dp.yPos - dp.prevYPos;
+
+            try
+            {
+                // Draw the center point of the previous position
+                dp.grid[dp.prevXPos * 3 + 1][dp.prevYPos * 3 + 1] = 2;
+                Thread.sleep(50);
+                // Draw the road to the next point
+                dp.grid[dp.prevXPos * 3 + 1 + xDiff][dp.prevYPos * 3 + 1 + yDiff] = 2;
+                Thread.sleep(50);
+                // Draw the raod to the next point
+                dp.grid[dp.xPos * 3 + 1 - xDiff][dp.yPos * 3 + 1 - yDiff] = 2;
+                // Draw the next point's center point.
+                dp.grid[dp.xPos * 3 + 1][dp.yPos * 3 + 1] = 2;
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
+
         }
         // For testing purpose.
+        dp.repaint();
 
         for(int i = 0; i < dp.ROW; i++){
             for(int j = 0; j < dp.COL; j++){
