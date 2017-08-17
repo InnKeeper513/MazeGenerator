@@ -10,26 +10,35 @@ public class DrawPanel extends JPanel {
     static final int MOVE = 3;
     static final int BLANK = 75;
     static int [][] grid;
+    static int [][] maze;
+    int xPos = 0;
+    int yPos = 0;
+
+    int prevXPos = 0;
+    int prevYPos = 0;
+
+    public int getX(){
+        return xPos;
+    }
+    public int getY(){
+        return yPos;
+    }
 
     DrawPanel() {
 
         // initialization;
         grid = new int[ROW * PIXEL_SIZE][COL * PIXEL_SIZE];
- /*
-                XXXOOOXXX
-                XXXOOOXXX
-                XXXOOOXXX
-                OOOOOOOOO
-                OOOOOOOOO
-                OOOOOOOOO
-                XXXOOOXXX
-                XXXOOOXXX
-                XXXOOOXXX
-                 */
+        maze = new int[ROW][COL];
+
+        // For the maze 0 is unexplored, 1 is explored, 2 is went back
+        for(int i = 0; i < ROW; i++){
+            for(int j = 0; j < COL; j++){
+                maze[i][j] = 0;
+            }
+        }
         // Set the walls
         for (int i = 0; i < ROW * PIXEL_SIZE; i++) {
             for (int j = 0; j < COL * PIXEL_SIZE; j+=PIXEL_SIZE) {
-
                grid[i][j] = 3;
                grid[i][j+1] = 3;
                grid[i][j+2] = 3;
@@ -39,19 +48,14 @@ public class DrawPanel extends JPanel {
                grid[i][j+6] = 3;
                grid[i][j+7] = 3;
                grid[i][j+8] = 3;
-
             }
         }
 
         for (int i = 0; i < ROW * PIXEL_SIZE; i++) {
             for (int j = 0; j < COL * PIXEL_SIZE; j+=PIXEL_SIZE) {
-
-
                 grid[j+3][i] = 0;
                 grid[j+4][i] = 0;
                 grid[j+5][i] = 0;
-
-
             }
         }
     }
