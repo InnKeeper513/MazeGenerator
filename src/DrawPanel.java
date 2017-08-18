@@ -9,6 +9,7 @@ public class DrawPanel extends JPanel {
     static final int COL = 30;
     static final int MOVE = 3;
     static final int BLANK = 75;
+    static boolean developerMode = false;
     static int [][] grid;
     static int [][] maze;
     int xPos = 0;
@@ -55,25 +56,48 @@ public class DrawPanel extends JPanel {
     public void paint(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
 
-        g2d.setColor(Color.GRAY);
+        g2d.setColor(Color.WHITE);
         g2d.fillRect(0,0,getWidth(),getHeight());
 
-        for(int i = 0; i < ROW * 3; i++){
-            for(int j = 0; j < ROW * 3; j++){
-                if(grid[i][j] == 0){
+        for(int i = 0; i < ROW * 3; i++) {
+            for (int j = 0; j < ROW * 3; j++) {
+                if (grid[i][j] == 0) {
                     // WALL
                     g2d.setColor(Color.BLACK);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3,BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
-                } else if(grid[i][j] == 1){
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3, SINGLE_PIX * 3);
+                } else if (grid[i][j] == 1) {
                     // PATH
                     g2d.setColor(Color.WHITE);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3,BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
-                } else if(grid[i][j] == 2){
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3, SINGLE_PIX * 3);
+                } else if (grid[i][j] == 2) {
                     // RETURN PATH
                     g2d.setColor(Color.BLUE);
-                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3,SINGLE_PIX * 3);
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3, SINGLE_PIX * 3);
+                } else if (grid[i][j] == 3) {
+                    // RETURN PATH
+                    g2d.setColor(Color.RED);
+                    g2d.fillRect(BLANK + i * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3, SINGLE_PIX * 3, SINGLE_PIX * 3);
                 }
             }
         }
+
+        // Draw the entrance
+        g2d.setColor(Color.ORANGE);
+        g2d.fillRect(BLANK + SINGLE_PIX*3, BLANK + SINGLE_PIX * 3,SINGLE_PIX * 3, SINGLE_PIX * 3);
+        // Draw the exit
+        g2d.setColor(Color.ORANGE);
+        g2d.fillRect(BLANK + ROW*3 * SINGLE_PIX*3 - SINGLE_PIX*6, BLANK + COL*3 * SINGLE_PIX * 3 - SINGLE_PIX*6,SINGLE_PIX * 3, SINGLE_PIX * 3);
+
+        // Testing Grids
+
+        if(developerMode) {
+            for (int i = 0; i < ROW * 3; i++) {
+                for (int j = 0; j < ROW * 3; j++) {
+                    g2d.drawLine(BLANK, BLANK + j * SINGLE_PIX * 3, BLANK + ROW * 3 * SINGLE_PIX * 3, BLANK + j * SINGLE_PIX * 3);
+                }
+                g2d.drawLine(BLANK + i * SINGLE_PIX * 3, BLANK, BLANK + i * SINGLE_PIX * 3, BLANK + ROW * 3 * SINGLE_PIX * 3);
+            }
+        }
+
     }
 }

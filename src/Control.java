@@ -1,27 +1,35 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// Some more new features to the control panel class.
+// 1. One path finder that marks out the path
+// 2. Clear out the path
+// 3. Create a city simulator. And keep adding in new features.
+// 4. Zoom in and zoom out of the program.
+// 5. Can drag the program around
+// 6. Set the exit and starting position of the maze.
+// 7. Customize the size of the maze.
+
+
+
 public class Control extends JPanel {
 
-
+    boolean developerMode = false;
+    int grid[][];
     Stack<Coordinate> rewind = new Stack<>();
+    JLabel generate = new JLabel("Generate a Maze");
     JButton move = new JButton("Move");
     JButton timer = new JButton("Start");
-
-    // Check if the maze has done its creation
-    public boolean checkDone(DrawPanel dp){
-        for(int i = 0; i < dp.ROW; i++){
-            for(int j = 0; j < dp.COL; j++){
-                if(dp.maze[i][j] != 2)
-                    return false;
-            }
-        }
-        return true;
-    }
+    JButton clear = new JButton("Clear");
+    JButton create = new JButton("Create");
+    JLabel run = new JLabel("Run through the Maze");
+    JButton autoRun = new JButton("Auto-Run");
+    JCheckBox editor = new JCheckBox("Developer Mode");
 
     public Control(DrawPanel dp){
 
@@ -33,39 +41,103 @@ public class Control extends JPanel {
         ActionListener al = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(e.getSource() == autoRun){
+                    if(checkDone(dp))
+                        autoRun(dp);
+                }
+
+
                 if(e.getSource() == move)
-                    random(dp);
+                    random(dp,0);
 
                 if(e.getSource() == timer){
-                        random(dp);
-                        Timer timing = new Timer();
-                        timing.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
+                    random(dp,50);
+                    Timer timing = new Timer();
+                    timing.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
 
-                                  if (!checkDone(dp)) {
-                                    random(dp);
-                                  } else {
-                                        timing.cancel();
-                                        timing.purge();
-                                  }
-
+                            if (!checkDone(dp)) {
+                                random(dp,50);
+                            } else {
+                                timing.cancel();
+                                timing.purge();
                             }
-                        },0,50);
 
+                        }
+                    },0,50);
+
+                }
+
+                if(e.getSource() == editor){
+                    System.out.println("ASD");
+                    dp.developerMode = !dp.developerMode;
+                    dp.repaint();
+                }
+
+                if(e.getSource() == clear){
+                    dp.xPos = 0;
+                    dp.yPos = 0;
+                    dp.prevYPos = 0;
+                    dp.prevXPos = 0;
+
+                    for(int i = 0; i < dp.ROW; i ++){
+                        for(int j = 0; j < dp.COL; j++){
+                            dp.maze[i][j] = 0;
+                        }
+                    }
+
+                    for(int i = 0; i < dp.ROW * 3; i++){
+                        for(int j = 0; j < dp.COL * 3; j++){
+                            dp.grid[i][j] = 0;
+                        }
+                    }
+                    dp.repaint();
+                }
+
+                if(e.getSource() == create){
+                    while(!checkDone(dp))
+                        random(dp,0);
                 }
             }
         };
 
+        this.setLayout(null);
+
+        generate.setBounds(10,10,200,20);
+        add(generate);
+
+        move.setBounds(10,40,100,30);
         move.addActionListener(al);
-        move.setVisible(true);
         add(move);
 
+        timer.setBounds(120,40,100,30);
         timer.addActionListener(al);
-        timer.setVisible(true);
         add(timer);
+
+        clear.setBounds(230,40,100,30);
+        clear.addActionListener(al);
+        add(clear);
+
+        create.setBounds(340,40,100,30);
+        create.addActionListener(al);
+        add(create);
+
+        run.setBounds(10,100,200,20);
+        add(run);
+
+        autoRun.setBounds(10,130,100,30);
+        autoRun.addActionListener(al);
+        add(autoRun);
+
+        editor.setBounds(10,900,200,40);
+        editor.addActionListener(al);
+        add(editor);
+
     }
 
+
+    // ************************** Maze Generator *****************************************************
     Vector<Coordinate> availablePositions(DrawPanel dp) {
 
         Vector<Coordinate> coord = new Vector<Coordinate>();
@@ -138,7 +210,7 @@ public class Control extends JPanel {
         return coord;
     }
 
-    public void random(DrawPanel dp){
+    public void random(DrawPanel dp, int seconds){
 
         // If not done
         if(checkDone(dp)){
@@ -183,10 +255,10 @@ public class Control extends JPanel {
             {
                 // Draw the center point of the previous position
                 dp.grid[dp.prevXPos * 3 + 1][dp.prevYPos * 3 + 1] = 1;
-                Thread.sleep(50);
+                Thread.sleep(seconds);
                 // Draw the road to the next point
                 dp.grid[dp.prevXPos * 3 + 1 + xDiff][dp.prevYPos * 3 + 1 + yDiff] = 1;
-                Thread.sleep(50);
+                Thread.sleep(seconds);
                 // Draw the raod to the next point
                 dp.grid[dp.xPos * 3 + 1 - xDiff][dp.yPos * 3 + 1 - yDiff] = 1;
                 // Draw the next point's center point.
@@ -215,10 +287,10 @@ public class Control extends JPanel {
             {
                 // Draw the center point of the previous position
                 dp.grid[dp.prevXPos * 3 + 1][dp.prevYPos * 3 + 1] = 2;
-                Thread.sleep(50);
+                Thread.sleep(seconds);
                 // Draw the road to the next point
                 dp.grid[dp.prevXPos * 3 + 1 + xDiff][dp.prevYPos * 3 + 1 + yDiff] = 2;
-                Thread.sleep(50);
+                Thread.sleep(seconds);
                 // Draw the raod to the next point
                 dp.grid[dp.xPos * 3 + 1 - xDiff][dp.yPos * 3 + 1 - yDiff] = 2;
                 // Draw the next point's center point.
@@ -242,5 +314,35 @@ public class Control extends JPanel {
         System.out.println("********************************NEXT************************************");
 
     }
+
+    public boolean checkDone(DrawPanel dp){
+        for(int i = 0; i < dp.ROW; i++){
+            for(int j = 0; j < dp.COL; j++){
+                if(dp.maze[i][j] != 2)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    // ************************** Maze Generator *****************************************************
+    // ************************** Maze Runner ********************************************************
+    public void autoRun(DrawPanel dp){
+
+        // Place a copy
+        grid = dp.grid;
+        dp.grid[1][1] = 3;
+
+        dp.grid[dp.ROW * 3 - 2][dp.COL * 3 - 2] = 3;
+
+        dp.repaint();
+        // Red spot represents the player's person identity.
+
+        // Beginning at 1,1.
+
+        // If find a position at ROW * 3 - 2, COLUMN * 3 - 2
+
+    }
+    // ************************** Maze Runner ********************************************************
 
 }

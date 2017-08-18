@@ -18,6 +18,4 @@ public class DrawFrame extends JFrame {
         cp.setBounds(1000,0,500,1000);
         this.add(cp);
     }
-
-
 }
